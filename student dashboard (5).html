@@ -1,0 +1,652 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <style>
+        /* Basic Reset */
+        body {
+            margin: 50px;
+            padding: 0;
+            height: 88vh;
+            font-family: Arial, sans-serif;
+            background: #f0f4f8;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+         
+        }
+
+/* Main Container */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    flex-grow: 1;
+}
+
+.form-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    width: 350px;
+    text-align: center;
+    margin-top: 80px;
+}
+
+/* Inputs & Buttons */
+input[type="text"], input[type="password"], input[type="number"], input[type="tel"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    
+}
+input:focus{
+  box-shadow: 0.1px 0.1px 3px 0.1px #00C3FF;
+}
+
+button {
+    padding: 10px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Dashboard Layout */
+.dashboard {
+    display: none;
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+    margin-top: -80px;
+}
+
+.dashboard h2 {
+    text-align: left;
+    color: #333;
+}
+#adminLoginPage {
+    display: none; /* Initially hidden */
+}
+
+#adminLoginPage.active {
+    display: flex; /* Show when active */
+}
+
+.card {
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    margin: 10px 0;
+}
+
+.name-card { background: #ffebcc; }
+.roll-card { background: #e0f7fa; }
+.center-card { background: #e1bee7; }
+.email-card { background: #ffccbc; }
+.course-card { background: #fff3cd; }
+.batch-card { background: #d1ecf1; }
+.date-card { background: #f8d7da; }
+.guardian-card { background: #d4edda; }
+
+/* Card Grid for Responsiveness */
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+/* Full width cards on desktop */
+@media (min-width: 1024px) {
+    .card {
+        width: 100%;
+    }
+}
+
+/* Two-column layout for tablets and smaller screens */
+@media (max-width: 1023px) {
+    .card {
+        width: calc(50% - 10px);
+    }
+}
+
+/* Single-column layout for small mobile screens */
+@media (max-width: 600px) {
+    .card {
+        width: 100%;
+    }
+}
+
+/* Loading Spinner */
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #007bff;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 10px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Help icon */
+.help-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    font-size: 50px;
+    color: #007bff;
+    cursor: pointer;
+}
+#loginError{
+  color: #FF0000;
+}
+#studentName{
+  color: red;
+}
+.footer{
+  text-align: center;
+  width: 100%;
+}
+.design{
+  color: #3F3F49;
+  font-weight: bold;
+  font-size: 10px;
+  font-family: arial;
+}
+#emailSim{
+  background: #90F5D9;
+}
+.redirect{
+  color: #2D7826;
+}
+.branch{
+  font-size: 22px;
+  font-family: Arial;
+  font-weight: bolder;
+  color: #F00E0E;
+}
+.dwnld{
+  background: #4E8A35;
+}
+.bnch{
+  font-family: Courier;
+  font-size: 17px;
+  font-weight: bolder;
+  color: #4E8A35;
+}
+.hhdr{
+  width: 100%;
+  height: 50px;
+  background: #FFFF00;
+  margin-top: -470px;
+  position: absolute;
+}
+/* Notification Styling */
+.notification {  
+    display: flex;  
+    justify-content: space-between;  
+    align-items: center;  
+    background-color: #ffcccb;  
+    color: #d8000c;  
+    padding: 15px;  
+    border: 1px solid #d8000c;  
+    border-radius: 5px;  
+    position: fixed;  
+    top: 0;  
+    left: 0;  
+    right: 0;  
+    z-index: 1000;  
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);  
+}  
+
+.notification.hidden {  
+    display: none;  
+}  
+
+/* Close button styling */
+.close-btn {  
+    background: none;  
+    border: none;  
+    font-size: 18px;  
+    cursor: pointer;  
+    color: #d8000c;  
+}  
+
+.close-btn:hover {  
+    color: #a70000;  
+}
+.offline{
+  color: red;
+}
+i{
+  color: #FFA100;
+}
+.header {
+    width: 100%;
+    height: 45px;
+    background: #007bff;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    font-size: 24px;
+    font-weight: bold;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+.address{
+  font-size: 15px;
+  color: #B8BACC;
+}
+</style>
+</head>
+<body>
+  <div class="header">
+    IIT-CEC Katlicherra Branch<br><label class="address"> Address: Katlicherra, Hailakandi, Assam 788161</label>
+</div>
+<div id="authSection" class="container">
+    <div id="loginPage" class="form-container">
+        <h2><i class="fa fa-users"></i> Student Login</h2>
+     <font color="red">**All the fields are mandatory !!</font>
+     <input type="tel" id="phone" placeholder="Enter Registered Mobile Number" maxlength="10">
+        <input type="text" id="username" placeholder="Enter Username">
+        <input type="password" id="password" placeholder="Enter Password"><div>
+        <input type="checkbox" id="showPassword" onclick="togglePassword()"> Show Password
+    </div>
+    <p id="loginError" class="error-message hidden">Invalid username or password.</p>
+<br>
+
+<button id="loginButton" onclick="initiate2FA()"><span id="loginText"><i class="fa fa-sign-in"></i> Login</span>
+<div id="loginSpinner" class="spinner hidden"></div>
+
+</button>
+</div>
+<!-- 2FA Verification -->
+<div id="verificationPage" class="form-container hidden">
+    <h2>Two-Factor Authentication</h2>
+    <p>Enter the verification code Shown Below:</p>
+    <div id="emailSim" class="email-sim hidden">
+    </div>
+    <input type="number" id="verificationCode" placeholder="Enter 6-digit code">
+<button onclick="verifyCode()">Verify</button>
+
+<div id="loadingSpinner" class="hidden">
+    <p class="redirect">Checking Code & Redirecting to Student Dashboard Page...</p>
+    <div class="spinner"></div>
+</div>
+
+<p id="verificationError" class="error-message hidden" style="color: red;">Invalid code. Please try again.</p>
+
+</div></div>
+<div id="dashboardPage" class="dashboard">
+<!-- Dashboard -->
+  <!-- Notification Banner -->
+<div id="feeNotification" class="notification hidden">
+    <span id="notificationText"></span>
+    <button class="close-btn" onclick="closeNotification()">✖</button>
+</div>
+  <br>
+<br><br><br><br>
+    <h2>Welcome, <span id="studentName"></span> !!</h2>
+    <div class="card-container">
+        <div class="card name-card">
+            <h3>Name</h3>
+            <p id="studentFullName"></p>
+        </div>
+        <div class="card roll-card">
+            <h3>Roll Number</h3>
+            <p id="studentRoll"></p>
+        </div>
+        <div class="card center-card">
+            <h3>Study Centre Name</h3>
+            <p id="studentCenter" style="color: red; font-weight: bold; font-family: courier;"></p>
+        </div>
+       <!-- Fees Status Card -->
+<div class="card email-card">
+    <h3>Fees Status</h3>
+    <p id="studentFees"></p>
+    <button id="payFeesButton" onclick="payFees()">Pay Fees</button>
+   <a href="https://forms.gle/XfBFVDUGQg85ciRc8"><button class="payment" onclick="return confirm('You will be redirected to an external site. Click Ok to continue...')">Go to Upload Screenshot</button></a>
+</div>
+        <div class="card course-card">
+            <h3>Course</h3>
+            <p id="studentCourse"></p>
+        </div>
+        <div class="card batch-card">
+            <h3>Batch Timing</h3>
+            <p id="studentBatchTime"></p>
+        </div>
+        <div class="card date-card">
+            <h3>Admission Date</h3>
+            <p id="studentAdmissionDate"></p>
+        </div>
+  <div class="card guardian-card">
+            <h3>Contact Number</h3>
+            <p id="studentPhone"></p>
+        </div>
+    </div>
+    <br><br>
+    <p align="right"><button onclick="confirmLogout()" style="background: #F00E0E;"><i class="fa fa-power-off"></i> Logout</button></p>
+</div>
+<i class="fa fa-question-circle help-icon" onclick="showHelp()" action="mailto: iitcecktc1916@gmail.com"></i>
+<br><br><br><br><br>
+<center>
+<div class="footer">
+  <span class="design">
+<i class="fa fa-pencil"></i>  Designed and Developed By : Dhrubajyoti Roy <br>&copy; All Right Reserved || IIT-CEC Katlicherra Branch
+  </span>
+</div>
+</center>
+<script>
+    // Declare global variables
+    let generatedCode;
+    let currentUser;
+
+    const studentData = {
+        "Dhrubajyoti1122": { 
+            name: "Dhrubajyoti Roy", 
+            roll: "313", 
+            course: "DCOM", 
+            fees: "0 Months Pending", 
+            center: "IIT-CEC Katlicherra Branch",
+            batchTime: "02:00 PM to 06:30 PM",
+            admissionDate: "26-Mar-2023",
+            phone: "6900877067"
+        },
+      
+        "Priyanka581": {
+          name: "Priyanka Upadhaya",
+          roll: "581",
+          course: "DIT",
+          fees: "7 Months Pending",
+          center: "IIT-CEC Katlicherra Branch",
+          batchTime: "05:00PM to 06:30PM",
+          admissionDate: "12-Jul-2023",
+          phone: "+91 6901191545"
+        },
+        "Sandip670": {
+          name: "Sandip Rikiason",
+          roll: "670",
+          course: "DCOM",
+          fees: "3 Months Pending",
+          center: "IIT-CEC Katlicherra Branch",
+          batchTime: "05:00PM to 06:30PM",
+          admissionDate: "25-Apr-2024",
+          phone: "9864454237"
+        },
+        "Pritom613":{
+          name: "Pritom Kalowar",
+          roll: "613",
+          course: "DCOM",
+          fees: "Fees Clear",
+          center: "IIT-CEC Katlicherra Branch",
+          batchTime: "02:00PM to 03:30PM",
+          admissionDate: "14-Mar-2024",
+          phone: "6000020731"
+        },
+        "Jahidul614": {
+          name: "Jahidul Islam Barlaskar",
+          roll: "614",
+          course: "DCOM",
+          fees: "3 Months Pending",
+          center: "IIT-CEC Katlicherra Branch",
+          batchTime: "03:30PM to 05:00PM",
+          admissionDate: "15-Mar-2024",
+          phone: "9365894140"
+        },
+    };
+
+    const passwords = {
+        "Dhrubajyoti1122": "Dhruba@1122",
+        "Sandip670": "Sand@2024",
+        "Priyanka581": "Priy@2023",
+        "Pritom613": "Prit@2024",
+        "Jahidul614": "Jahi@2024"
+    };
+function initiate2FA() {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+    const loginSpinner = document.getElementById("loginSpinner");
+    const loginText = document.getElementById("loginText");
+
+    // Check credentials first
+    if (studentData[username] && password === passwords[username]) {
+        currentUser = studentData[username];
+
+        // Show spinner and disable button
+        loginSpinner.classList.remove("hidden");
+        loginText.innerText = "Redirecting...";
+        document.getElementById("loginButton").disabled = true;
+
+        // Simulate a delay to show spinner effect
+        setTimeout(() => {
+            sendVerificationCode();
+            document.getElementById("loginPage").classList.add("hidden");
+            document.getElementById("verificationPage").classList.remove("hidden");
+
+            // Hide spinner and reset button
+            loginSpinner.classList.add("hidden");
+            loginText.innerText = "Login";
+            document.getElementById("loginButton").disabled = false;
+        }, 1000);
+    } else {
+        // Show error if credentials are wrong
+        document.getElementById("loginError").classList.remove("hidden");
+    }
+}
+
+    function sendVerificationCode() {
+        generatedCode = Math.floor(100000 + Math.random() * 900000);
+        const emailSim = document.getElementById("emailSim");
+        emailSim.innerHTML = `<strong>Verification Code:</strong> ${generatedCode}`;
+        emailSim.classList.remove("hidden");
+    }
+
+    function verifyCode() {  
+    const enteredCode = parseInt(document.getElementById("verificationCode").value);  
+    const loadingSpinner = document.getElementById("loadingSpinner");  
+    const verificationError = document.getElementById("verificationError");  
+
+    loadingSpinner.classList.remove("hidden");  
+
+    setTimeout(() => {  
+        loadingSpinner.classList.add("hidden");  
+
+        if (enteredCode === generatedCode) {  
+            // Hide the verification page and show the dashboard  
+            document.getElementById("verificationPage").classList.add("hidden");  
+            document.getElementById("dashboardPage").style.display = "block";  
+
+            // Fill in student details on the dashboard  
+            document.getElementById("studentName").innerText = currentUser.name;  
+            document.getElementById("studentFullName").innerText = currentUser.name;  
+            document.getElementById("studentRoll").innerText = currentUser.roll;  
+            document.getElementById("studentCenter").innerText = currentUser.center;  
+            document.getElementById("studentFees").innerText = currentUser.fees;  
+            document.getElementById("studentCourse").innerText = currentUser.course;  
+            document.getElementById("studentBatchTime").innerText = currentUser.batchTime;  
+            document.getElementById("studentAdmissionDate").innerText = currentUser.admissionDate;
+            document.getElementById("studentPhone").innerText = currentUser.phone;
+
+            // Show notification if pending fees are greater than 2 months
+            const feesStatus = currentUser.fees;  
+            const monthsMatch = feesStatus.match(/\d+/);  
+            const pendingMonths = monthsMatch ? parseInt(monthsMatch[0]) : 0;  
+
+            if (pendingMonths > 2) {  
+                showNotification(`⚠️ Reminder: Dear ${currentUser.name}, You have ${pendingMonths} months of pending fees. Please clear them to avoid class related Problems !!`);  
+            }
+            if (pendingMonths < 1) {
+              showNotification(`✅ All Clear !! No Fees Pending...`);
+            }
+
+        } else {  
+            // Show error if the code is incorrect  
+            verificationError.classList.remove("hidden");  
+        }  
+    }, 1000);  // Simulate verification delay  
+}
+
+// Function to show notification  
+function showNotification(message) {  
+    const notification = document.getElementById("feeNotification");  
+    const notificationText = document.getElementById("notificationText");  
+    
+    notificationText.innerText = message;  
+    notification.classList.remove("hidden");  
+}
+
+// Function to close notification  
+function closeNotification() {  
+    const notification = document.getElementById("feeNotification");  
+    notification.classList.add("hidden");  
+}
+
+            
+    function confirmLogout() {
+        if (confirm("Are you sure you want to log out?")) location.reload();
+    }
+
+    function showHelp() {
+        alert("Contact: iitcecktc1916@gmail.com or call +91-7002725247 // +91-8638887254");
+    }
+    function togglePassword() {
+        const passwordInput = document.getElementById("password");
+        
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+        } else {
+            passwordInput.type = "password";
+        }
+    }
+   
+function calculateFee(months, course) {
+  if (course=== "ADCA") {
+    return months * 600;
+  }
+    if (course === "DCOM") {
+        return months * 500;
+    }
+    if (course === "DIT") {
+        return months * 600;
+    } 
+    if (course === "DCA"){
+      return months * 600;
+    }
+    else {
+        return 0; // Handle other courses or invalid entries
+    }
+}
+
+function payFees() {
+    const feesStatus = currentUser.fees;
+    const course = currentUser.course;
+
+    const monthsMatch = feesStatus.match(/\d+/);
+    const pendingMonths = monthsMatch ? parseInt(monthsMatch[0]) : 0;
+
+    if (pendingMonths > 0) {
+        const payFull = confirm(`You have ${pendingMonths} months fees pending. If you want to pay for all of them click OK, or Cancel to pay for a specific number of months.`);
+
+        let monthsToPay = pendingMonths;
+
+        if (!payFull) {
+            const enteredMonths = prompt(`How many months do you want to pay for? (Max: ${pendingMonths})`);
+            monthsToPay = parseInt(enteredMonths);
+
+            if (isNaN(monthsToPay) || monthsToPay <= 0 || monthsToPay > pendingMonths) {
+                alert("Invalid input. Please enter a valid number of months.");
+                return;
+            }
+        }
+
+        const amount = calculateFee(monthsToPay, course);
+
+        if (amount > 0) {
+            const upiId = "7002725247@okbizaxis";
+            const studentName = encodeURIComponent(currentUser.name);
+            const transactionId = "TXN" + Date.now(); // Generate a fake transaction ID for receipt
+
+            const upiUrl = `upi://pay?pa=${upiId}&pn=${studentName}&am=${amount}&cu=INR`;
+
+            // Show QR code and payment link
+            const qrContainer = document.createElement("div");
+            qrContainer.innerHTML = `
+                <h3>Scan QR to Pay</h3>
+                <canvas id="upiQrCode"></canvas>
+                <p>Or <a href="${upiUrl}" target="_blank">Click here to Pay via UPI</a></p>
+            `;
+            document.body.appendChild(qrContainer);
+
+            // Generate QR code
+            QRCode.toCanvas(document.getElementById("upiQrCode"), upiUrl, (error) => {
+                if (error) {
+                    console.error("Error generating QR code:", error);
+                }
+            });
+
+            alert(`Your payment amount is ₹${amount}. Scroll down below and Scan the QR code or click on the link to complete the payment.`);
+        }
+    } else {
+        alert("Your Fees are already cleared.");
+    }
+}
+    // Check if the user is online
+    function checkOnlineStatus() {
+        if (navigator.onLine) {
+            // User is online, show the page
+            document.body.style.display = "block";
+        } else {
+            // User is offline, show a message
+            document.body.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <h2 class="offline"> 📴<br> You are offline...</h2>
+                    <p>Please check your internet connection and reload the page.</p>
+                </div>
+                <br>
+                <center>
+                <button onclick="reloadPage()"><i class="fa fa-refresh"></i> Reload Page</button>
+                </center>
+            `;
+        }
+    }
+
+    // Check status when the page loads
+    window.onload = checkOnlineStatus;
+
+    // Add event listeners for online and offline events
+    window.addEventListener("online", checkOnlineStatus);
+    window.addEventListener("offline", checkOnlineStatus);
+    function reloadPage(){
+      location.reload();
+    }
+</script>
+</body>
+</html>
